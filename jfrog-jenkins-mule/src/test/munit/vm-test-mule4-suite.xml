@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="vm-test-mule4-suite.xml" />
+	<munit:test name="vm-test-mule4-non-persistent-test" doc:id="91365698-ada7-46b6-83a6-259957697675" >
+		<munit:behavior >
+			<munit-tools:spy doc:name="Spy Publish" doc:id="318d5b27-0dc9-4f76-ae2a-33e3fc1f4cb2" processor="vm:publish">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d2d9381d-191a-430d-a916-7de27f44a89a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="d5f8e18e-2556-424f-ae1b-4cb77b2319cd" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import vmtestmule4nonpersistenttest::spy_assert_payload
+---
+spy_assert_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="68317620-c647-47ba-b73b-ada060dffc12" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import vmtestmule4nonpersistenttest::spy_assert_payload1
+---
+spy_assert_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit:set-event doc:name="Set Input" doc:id="d530ab60-1dd9-4541-adae-d2971de20831" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://vmtestmule4nonpersistenttest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://vmtestmule4nonpersistenttest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to vm-test-mule4-non-persistent" doc:id="9653f8f7-ed4c-49bc-8b52-21ca94f5c5ee" name="vm-test-mule4-non-persistent"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="888a84f9-1204-45c4-89d9-7bab34c6058c" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import vmtestmule4nonpersistenttest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify Logger" doc:id="c3e62a03-84fe-4e59-aa95-d173f2203937" processor="logger" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="925e314d-a0d9-4179-be48-d89e57133e76" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Publish" doc:id="d3e6fa9f-112b-4226-ab95-967357a1a0db" processor="vm:publish" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d2d9381d-191a-430d-a916-7de27f44a89a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
